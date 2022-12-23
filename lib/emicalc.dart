@@ -14,6 +14,13 @@ class _EMIcalcState extends State<EMIcalc> {
   double loanInterest = 5;
   double loanYears = 5;
 
+  double totalInterest = 0;
+  double perMonthEMI = 0;
+  double perMonthInterest = 0;
+
+  int interestPerMonth = 0;
+  int emiPerMonth = 0;
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -31,9 +38,67 @@ class _EMIcalcState extends State<EMIcalc> {
               height: 300,
               width: double.infinity,
               decoration: BoxDecoration(
+                boxShadow: [
+                  BoxShadow(
+                      color: Colors.black12, blurRadius: 5, spreadRadius: 5),
+                ],
                 color: Color(0xFF395B64),
               ),
             ),
+
+            // per month emi text / container
+            Container(
+              height: 150,
+              width: double.infinity,
+              //color: Colors.white,
+
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // per month emi
+                      Container(
+                        height: 100,
+                        width: 200,
+                        //color: Colors.white,
+                        child: Column(
+                          children: [
+                            Text("Your EMI is",style: TextStyle(color: Color(0xFFE7F6F2),letterSpacing: 2,fontSize: 10,),),
+                            SizedBox(height: 4,),
+                            Text("\$ $emiPerMonth",style: TextStyle(color: Color(0xFFE7F6F2),letterSpacing: 2,fontSize: 40,fontWeight: FontWeight.bold),),
+                            SizedBox(height: 4,),
+                            Text("Per month",style: TextStyle(color: Color(0xFFE7F6F2),letterSpacing: 2,fontSize: 10,),),
+                          ],
+                        ),
+                      ),
+
+                      // per month interest
+                      Container(
+                        height: 100,
+                        width: 200,
+                        //color: Colors.white,
+                        child: Column(
+                          children: [
+                            Text("Your Interest",style: TextStyle(color: Color(0xFFE7F6F2),letterSpacing: 2,fontSize: 10,),),
+                            SizedBox(height: 4,),
+                            Text("\$ $interestPerMonth",style: TextStyle(color: Color(0xFFE7F6F2),letterSpacing: 2,fontSize: 40,fontWeight: FontWeight.bold),),
+                            SizedBox(height: 4,),
+                            Text("Per month",style: TextStyle(color: Color(0xFFE7F6F2),letterSpacing: 2,fontSize: 10,),),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+
+
+
+                ],
+              ),
+            ),
+
 
             // container of slider
             Center(
@@ -46,6 +111,12 @@ class _EMIcalcState extends State<EMIcalc> {
                     height: 450,
                     width: double.infinity,
                     decoration: BoxDecoration(
+                      boxShadow: [
+                        BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 5,
+                            spreadRadius: 5),
+                      ],
                       borderRadius: BorderRadius.all(Radius.circular(10)),
                       color: Color(0xFFA5C9CA),
                     ),
@@ -154,29 +225,91 @@ class _EMIcalcState extends State<EMIcalc> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Container(
-                              height: 55,
-                              width: 150,
-                              decoration: BoxDecoration(
-                                  color: Color(0xFF2C3333),
-                                  borderRadius: BorderRadius.circular(10),
-                                  gradient: LinearGradient(colors: [
-                                    Color(0xFF2C3333),
-                                    Color(0xFF395B64),
-                                  ])),
+                            // clear container
+                            InkWell(
+                              onTap: () {
+                                setState(() {
+                                  loanAmount = 0;
+                                  loanInterest = 0;
+                                  loanYears = 0;
+                                });
+                              },
+                              child: Container(
+                                height: 55,
+                                width: 150,
+                                decoration: BoxDecoration(
+                                    boxShadow: [
+                                      BoxShadow(
+                                          color: Color(0xFF2C3333),
+                                          blurRadius: 1,
+                                          spreadRadius: 1),
+                                      BoxShadow(
+                                          color: Color(0xFF395B64),
+                                          blurRadius: 1,
+                                          spreadRadius: 1),
+                                    ],
+                                    color: Color(0xFF2C3333),
+                                    borderRadius: BorderRadius.circular(10),
+                                    gradient: LinearGradient(colors: [
+                                      Color(0xFF2C3333),
+                                      Color(0xFF395B64),
+                                    ])),
+                                child: Center(
+                                  child: Text("Clear",
+                                      style: TextStyle(
+                                        color: Color(0xFFE7F6F2),
+                                        fontSize: 25,
+                                        letterSpacing: 2,
+                                      )),
+                                ),
+                              ),
                             ),
 
-                            SizedBox(width: 50,),
-                            Container(
-                              height: 55,
-                              width: 150,
-                              decoration: BoxDecoration(
-                                  color: Color(0xFF2C3333),
-                                  borderRadius: BorderRadius.circular(10),
-                                  gradient: LinearGradient(colors: [
-                                    Color(0xFF2C3333),
-                                    Color(0xFF395B64),
-                                  ])),
+                            SizedBox(
+                              width: 50,
+                            ),
+
+                            // count container for all calculation
+                            InkWell(
+                              onTap: () {
+                                setState(() {
+                                  totalInterest = (loanAmount*loanInterest)/100;
+                                  perMonthEMI = (loanAmount+totalInterest)/(loanYears*12);
+                                  perMonthInterest = totalInterest / (loanYears*12);
+
+                                  interestPerMonth = perMonthInterest.toInt();
+                                  emiPerMonth = perMonthEMI.toInt();
+
+                                });
+                              },
+                              child: Container(
+                                height: 55,
+                                width: 150,
+                                decoration: BoxDecoration(
+                                    boxShadow: [
+                                      BoxShadow(
+                                          color: Color(0xFF2C3333),
+                                          blurRadius: 1,
+                                          spreadRadius: 1),
+                                      BoxShadow(
+                                          color: Color(0xFF395B64),
+                                          blurRadius: 1,
+                                          spreadRadius: 1),
+                                    ],
+                                    borderRadius: BorderRadius.circular(10),
+                                    gradient: LinearGradient(colors: [
+                                      Color(0xFF2C3333),
+                                      Color(0xFF395B64),
+                                    ])),
+                                child: Center(
+                                  child: Text("Count",
+                                      style: TextStyle(
+                                        color: Color(0xFFE7F6F2),
+                                        fontSize: 25,
+                                        letterSpacing: 2,
+                                      )),
+                                ),
+                              ),
                             ),
                           ],
                         ),
